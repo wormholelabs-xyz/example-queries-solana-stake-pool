@@ -2,6 +2,11 @@
   "dependencies": {
     "@wormhole-foundation/wormhole-query-sdk": "^0.0.7",
     "axios": "^1.6.5",
-    "bs58": "^5.0.0"
+    "bs58": "^5.0.0",
+    "ethers": "^6.10.0"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.5.1",
+    "typechain": "^8.3.2"
   }
 }
