@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@wormhole-foundation/wormhole-query-sdk": "^0.0.7",
+    "@wormhole-foundation/wormhole-query-sdk": "^0.0.8",
     "axios": "^1.6.5",
     "bs58": "^5.0.0",
     "dotenv": "^16.3.2",

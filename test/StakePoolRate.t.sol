@@ -14,7 +14,6 @@ contract CounterTest is Test {
         stakePoolRate = new StakePoolRate(
             0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B, 
             bytes32(hex"048a3e08c3b495be17f45427d89bec5b80c7e2695c1864d76743db39bed346d6"),
-            bytes32(hex"06814ed4caf68a174672fdac86031a63e84ea15efa1d44b72293f6dbdb001650"),
             60 * 60 * 6
         );
     }

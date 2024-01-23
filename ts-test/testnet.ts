@@ -7,6 +7,7 @@ import {
 import axios from "axios";
 import "dotenv/config";
 import { logQueryResponseInfo } from "./utils";
+import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
 
 (async () => {
   const QUERY_URL = "https://testnet.ccq.vaa.dev/v1/query";
@@ -19,7 +20,10 @@ import { logQueryResponseInfo } from "./utils";
 
   // devnet stake pool from
   // solana-program-library % ./target/release/spl-stake-pool --url "https://api.devnet.solana.com" list-all
-  const accounts = ["DBEr3Z4vdR9WH2jv1hY8Xh1KYQWnBGFjUubvLGdRSvZw"];
+  const accounts = [
+    "DBEr3Z4vdR9WH2jv1hY8Xh1KYQWnBGFjUubvLGdRSvZw",
+    "SysvarC1ock11111111111111111111111111111111",
+  ];
 
   const query = new QueryRequest(42, [
     new PerChainQueryRequest(
@@ -28,10 +32,8 @@ import { logQueryResponseInfo } from "./utils";
         "finalized",
         accounts,
         undefined,
-        // only query the required two fields
-        // https://github.com/solana-labs/solana-program-library/blob/b7dd8fee93815b486fce98d3d43d1d0934980226/stake-pool/program/src/state.rs#L87-L94
-        BigInt(258),
-        BigInt(16)
+        BigInt(DATA_SLICE_OFFSET),
+        BigInt(DATA_SLICE_LENGTH)
       )
     ),
   ]);
