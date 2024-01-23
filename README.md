@@ -88,3 +88,8 @@ So the deploy corresponding to the above integration test might look like
 ```bash
 forge create StakePoolRate --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --constructor-args 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B 0x048a3e08c3b495be17f45427d89bec5b80c7e2695c1864d76743db39bed346d6 21600
 ```
+
+---
+
+⚠ **This software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied. See the License for the specific language governing permissions and limitations under the License.**
