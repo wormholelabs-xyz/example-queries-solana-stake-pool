@@ -2,13 +2,11 @@ import {
   PerChainQueryRequest,
   QueryProxyMock,
   QueryRequest,
-  QueryResponse,
   SolanaAccountQueryRequest,
-  SolanaAccountQueryResponse,
 } from "@wormhole-foundation/wormhole-query-sdk";
-import bs58 from "bs58";
 import { Wallet, getDefaultProvider } from "ethers";
 import { StakePoolRate__factory } from "../types/ethers-contracts";
+import { logQueryResponseInfo } from "./utils";
 
 (async () => {
   const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
@@ -48,39 +46,7 @@ import { StakePoolRate__factory } from "../types/ethers-contracts";
     ),
   ]);
   const resp = await mock.mock(query);
-  const queryResponse = QueryResponse.from(Buffer.from(resp.bytes, "hex"));
-  const solResponse = queryResponse.responses[0]
-    .response as SolanaAccountQueryResponse;
-  const blockTime = new Date(
-    Number(BigInt(solResponse.blockTime) / BigInt(1000))
-  ).toISOString();
-  const totalActiveStake = Buffer.from(
-    solResponse.results[0].data
-  ).readBigUInt64LE(0);
-  const poolTokenSupply = Buffer.from(
-    solResponse.results[0].data
-  ).readBigUInt64LE(8);
-  const poolTokenValue = Number(totalActiveStake) / Number(poolTokenSupply);
-  console.log("account (base58)", accounts[0]);
-  console.log(
-    "account (hex)   ",
-    Buffer.from(bs58.decode(accounts[0])).toString("hex")
-  );
-  console.log("slotNumber      ", solResponse.slotNumber.toString());
-  console.log("blockTime       ", blockTime);
-  console.log("blockHash       ", bs58.encode(solResponse.blockHash));
-  console.log("owner (base58)  ", bs58.encode(solResponse.results[0].owner));
-  console.log(
-    "owner (hex)     ",
-    Buffer.from(solResponse.results[0].owner).toString("hex")
-  );
-  console.log(
-    "data            ",
-    Buffer.from(solResponse.results[0].data).toString("hex")
-  );
-  console.log("totalActiveStake", totalActiveStake.toString());
-  console.log("poolTokenSupply ", poolTokenSupply.toString());
-  console.log("poolTokenValue  ", poolTokenValue);
+  logQueryResponseInfo(resp.bytes);
 
   console.log(
     `\nDeploying StakePoolRate ${WORMHOLE_ADDRESS} ${JITO_ADDRESS_HEX} ${STAKE_POOL_OWNER_HEX} ${ALLOWED_STALENESS}\n`
