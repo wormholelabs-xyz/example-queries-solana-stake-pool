@@ -4,7 +4,7 @@ import {
   SolanaAccountQueryResponse,
 } from "@wormhole-foundation/wormhole-query-sdk";
 import bs58 from "bs58";
-import { DATA_SLICE_OFFSET, FIRST_FIELD_BYTE_IDX, SIZE_OF_U64 } from "./consts";
+import { FIRST_FIELD_BYTE_IDX, SIZE_OF_U64 } from "./consts";
 
 export function logQueryResponseInfo(bytes: string) {
   const queryResponse = QueryResponse.from(Buffer.from(bytes, "hex"));
