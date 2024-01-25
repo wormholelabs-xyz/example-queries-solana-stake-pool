@@ -24,7 +24,8 @@ contract StakePoolRate is QueryResponse {
     uint64 public lastUpdateSolanaBlockTime;
 
     bytes32 public immutable stakePoolAccount;
-    uint64 public immutable allowedStaleness;
+    uint64 public immutable allowedUpdateStaleness;
+    uint64 public immutable allowedRateStaleness;
 
     uint16 public constant SOLANA_CHAIN_ID = 1;
     bytes12 public constant SOLANA_COMMITMENT_LEVEL = "finalized";
@@ -40,9 +41,10 @@ contract StakePoolRate is QueryResponse {
     uint64 public constant SYSVAR_CLOCK_EXPECTED_DATA_LENGTH = 40;
     uint public constant SYSVAR_CLOCK_FIRST_FIELD_BYTE_IDX = 16;
 
-    constructor(address _wormhole, bytes32 _stakePoolAccount, uint64 _allowedStaleness) QueryResponse(_wormhole) {
+    constructor(address _wormhole, bytes32 _stakePoolAccount, uint64 _allowedUpdateStaleness, uint64 _allowedRateStaleness) QueryResponse(_wormhole) {
         stakePoolAccount = _stakePoolAccount;
-        allowedStaleness = _allowedStaleness;
+        allowedUpdateStaleness = _allowedUpdateStaleness;
+        allowedRateStaleness = _allowedRateStaleness;
     }
 
     function reverse(uint64 input) public pure returns (uint64 v) {
@@ -86,7 +88,7 @@ contract StakePoolRate is QueryResponse {
             revert InvalidAccount();
         }
         validateBlockNum(s.slotNumber, lastUpdateSolanaSlotNumber);
-        validateBlockTime(s.blockTime, block.timestamp - allowedStaleness);
+        validateBlockTime(s.blockTime, block.timestamp - allowedUpdateStaleness);
         if (s.results[0].data.length != STAKE_POOL_EXPECTED_DATA_LENGTH) {
             revert UnexpectedDataLength();
         }
@@ -115,7 +117,7 @@ contract StakePoolRate is QueryResponse {
     }
 
     function getRate() public view returns (uint64, uint64) {
-        validateBlockTime(lastUpdateSolanaBlockTime, block.timestamp - allowedStaleness);
+        validateBlockTime(lastUpdateSolanaBlockTime, block.timestamp - allowedRateStaleness);
         return (totalActiveStake, poolTokenSupply);
     }
 }
