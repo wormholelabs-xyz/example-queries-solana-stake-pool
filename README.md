@@ -38,7 +38,7 @@ The validation includes
 
 ### getRate
 
-Returns the `totalActiveStake` and `poolTokenSupply` fields as long as the last updated time is not stale.
+Returns the rate scaled to 1e18 as long as the last updated time is not stale. Effectively, `(totalActiveStake * (10 ** 18)) / poolTokenSupply`.
 
 ## Tests
 

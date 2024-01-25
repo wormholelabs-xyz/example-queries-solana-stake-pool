@@ -29,7 +29,7 @@ contract CounterTest is Test {
     uint64 mockBlockTime = 1706151199000000;
     uint64 mockTotalActiveStake = 6945276634127298;
     uint64 mockPoolTokenSupply = 6402815224864491;
-    uint mockRate = 1084722327;
+    uint256 mockRate = 1084722327634292716; // (mockTotalActiveStake * (10 ** 18)) / mockPoolTokenSupply
     
     function setUp() public {
         vm.warp(mockBlockTime/1_000_000);
@@ -72,9 +72,7 @@ contract CounterTest is Test {
         assertEq(stakePoolRate.lastUpdateSolanaBlockTime(), mockBlockTime);
         assertEq(stakePoolRate.totalActiveStake(), mockTotalActiveStake);
         assertEq(stakePoolRate.poolTokenSupply(), mockPoolTokenSupply);
-        (uint64 _totalActiveStake, uint64 _poolTokenSupply) = stakePoolRate.getRate();
-        assertEq(_totalActiveStake, mockTotalActiveStake);
-        assertEq(_poolTokenSupply, mockPoolTokenSupply);
+        assertEq(stakePoolRate.getRate(), mockRate);
     }
 
     function test_stale_update_reverts() public {
@@ -129,6 +127,20 @@ contract CounterTest is Test {
         signatures[0] = IWormhole.Signature({r: sigR, s: sigS, v: sigV, guardianIndex: sigGuardianIndex});
         _stakePoolRate.updatePool(mockMainnetResponse, signatures);
         _stakePoolRate.getRate();
+    }
+
+    function test_calculateRate() public {
+        assertEq(stakePoolRate.RATE_SCALE(), 18);
+        assertEq(stakePoolRate.calculateRate(mockTotalActiveStake,mockPoolTokenSupply), mockRate);
+        assertEq(stakePoolRate.calculateRate(1,1), 1 * 10 ** stakePoolRate.RATE_SCALE());
+        assertEq(stakePoolRate.calculateRate(2,1), 2 * 10 ** stakePoolRate.RATE_SCALE());
+        assertEq(stakePoolRate.calculateRate(1,2), 5 * 10 ** (stakePoolRate.RATE_SCALE()-1));
+        assertEq(stakePoolRate.calculateRate(type(uint64).max,type(uint64).max), 1 * 10 ** stakePoolRate.RATE_SCALE());
+        assertEq(stakePoolRate.calculateRate(0,1), 0);
+        vm.expectRevert();
+        stakePoolRate.calculateRate(0,0);
+        vm.expectRevert();
+        stakePoolRate.calculateRate(type(uint256).max,type(uint64).max);
     }
 
 }

@@ -22,11 +22,13 @@ contract StakePoolRate is QueryResponse {
     uint64 public poolTokenSupply;
     uint64 public lastUpdateSolanaSlotNumber;
     uint64 public lastUpdateSolanaBlockTime;
+    uint256 public calculatedRate;
 
     uint256 public immutable allowedUpdateStaleness;
     uint256 public immutable allowedRateStaleness;
     bytes32 public immutable stakePoolAccount;
 
+    uint8 public constant RATE_SCALE = 18;
     uint16 public constant SOLANA_CHAIN_ID = 1;
     bytes12 public constant SOLANA_COMMITMENT_LEVEL = "finalized";
     // SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy https://spl.solana.com/stake-pool
@@ -57,6 +59,13 @@ contract StakePoolRate is QueryResponse {
             ((v & 0x0000FFFF0000FFFF) << 16);
         // swap 4-byte long pairs
         v = (v >> 32) | (v << 32);
+    }
+
+    function calculateRate(uint256 _totalActiveStake, uint256 _poolTokenSupply) public pure returns (uint256 v) {
+        // scale the numerator so the decimal is shifted `RATE_SCALE` places
+        // this should be safe for values less than 58 (the difference between u64 and u256 scales) as long as these source values are u64
+        _totalActiveStake *= 10 ** RATE_SCALE;
+        v = _totalActiveStake / _poolTokenSupply;
     }
 
     // @notice Takes the cross chain query response for the stake pool on Solana and stores the result.
@@ -114,10 +123,16 @@ contract StakePoolRate is QueryResponse {
 
         lastUpdateSolanaSlotNumber = s.slotNumber;
         lastUpdateSolanaBlockTime = s.blockTime;
+
+        // pre-calculate the rate once per update
+        // according to testing, this saves ~578 gas on lookup but adds ~9076 gas to updates after the first
+        // so, this should be a gain assuming > 16x more reads than updates
+        calculatedRate = calculateRate(totalActiveStake, poolTokenSupply);
     }
 
-    function getRate() public view returns (uint64, uint64) {
+    // @notice Returns the rate scaled to 1e18
+    function getRate() public view returns (uint256) {
         validateBlockTime(lastUpdateSolanaBlockTime, allowedRateStaleness >= block.timestamp ? 0 : block.timestamp - allowedRateStaleness);
-        return (totalActiveStake, poolTokenSupply);
+        return calculatedRate;
     }
 }
