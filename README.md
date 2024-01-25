@@ -43,7 +43,10 @@ Returns the `totalActiveStake` and `poolTokenSupply` fields as long as the last 
 
 ### Unit Tests - Forge
 
-[`./test/StakePoolRate.t.sol`](./test/StakePoolRate.t.sol) tests the `reverse` method of the contract, which converts the `u64` fields stored in the Solana account from little-endian (Borsch) to big-endian (Solidity)
+[`./test/StakePoolRate.t.sol`](./test/StakePoolRate.t.sol) tests the following
+
+- `reverse` method of the contract, which converts the `u64` fields stored in the Solana account from little-endian (Borsch) to big-endian (Solidity)
+- `updatePool` positive test case, in which submitting a valid query updates the fields accordingly
 
 #### Run
 
