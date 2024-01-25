@@ -22,7 +22,8 @@ import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
   const JITO_ADDRESS_HEX = `0x${Buffer.from(
     base58.decode(JITO_SOL_POOL)
   ).toString("hex")}`;
-  const ALLOWED_STALENESS = 21600;
+  const THIRTY_MINUTES = 60 * 30;
+  const THIRTY_DAYS = 60 * 60 * 24 * 30;
 
   console.log(`Mocking query using ${SOLANA_RPC}\n`);
 
@@ -48,7 +49,7 @@ import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
   logQueryResponseInfo(resp.bytes);
 
   console.log(
-    `\nDeploying StakePoolRate ${WORMHOLE_ADDRESS} ${JITO_ADDRESS_HEX} ${ALLOWED_STALENESS}\n`
+    `\nDeploying StakePoolRate ${WORMHOLE_ADDRESS} ${JITO_ADDRESS_HEX} ${THIRTY_MINUTES} ${THIRTY_DAYS}\n`
   );
   const provider = getDefaultProvider(ETH_NETWORK);
   const signer = new Wallet(ANVIL_FORK_KEY, provider);
@@ -56,7 +57,8 @@ import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
   const stakePoolRate = await stakePoolRateFactory.deploy(
     WORMHOLE_ADDRESS,
     JITO_ADDRESS_HEX,
-    ALLOWED_STALENESS
+    THIRTY_MINUTES,
+    THIRTY_DAYS
   );
   console.log(`Deployed address ${await stakePoolRate.getAddress()}`);
 

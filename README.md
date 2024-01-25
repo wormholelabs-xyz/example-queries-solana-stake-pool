@@ -84,13 +84,13 @@ npx tsx .\ts-test\mock.ts
 The contract can be deployed with
 
 ```bash
-forge create StakePoolRate --private-key <YOUR_PRIVATE_KEY> --constructor-args <WORMHOLE_CORE_BRIDGE_ADDRESS> <STAKE_POOL_ADDRESS_HEX> <ALLOWED_STALENESS>
+forge create StakePoolRate --private-key <YOUR_PRIVATE_KEY> --constructor-args <WORMHOLE_CORE_BRIDGE_ADDRESS> <STAKE_POOL_ADDRESS_HEX> <ALLOWED_UPDATE_STALENESS> <ALLOWED_RATE_STALENESS>
 ```
 
 So the deploy corresponding to the above integration test might look like
 
 ```bash
-forge create StakePoolRate --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --constructor-args 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B 0x048a3e08c3b495be17f45427d89bec5b80c7e2695c1864d76743db39bed346d6 21600
+forge create StakePoolRate --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --constructor-args 0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B 0x048a3e08c3b495be17f45427d89bec5b80c7e2695c1864d76743db39bed346d6 1800 2592000
 ```
 
 ---

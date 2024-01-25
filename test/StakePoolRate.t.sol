@@ -16,8 +16,8 @@ contract CounterTest is Test {
     uint256 constant MOCK_GUARDIAN_PRIVATE_KEY = 0xcfb12303a19cde580bb4dd771639b0d26bc68353645571a8cff516ab2ee113a0;
     uint8 sigGuardianIndex = 0;
 
-    uint64 THIRTY_MINUTES = 60*30;
-    uint64 THIRTY_DAYS = 60*60*24*30;
+    uint256 THIRTY_MINUTES = 60*30;
+    uint256 THIRTY_DAYS = 60*60*24*30;
     bytes32 mockPoolAccount = 0x048a3e08c3b495be17f45427d89bec5b80c7e2695c1864d76743db39bed346d6;
 
     // some happy case defaults
@@ -96,6 +96,39 @@ contract CounterTest is Test {
         vm.warp((mockBlockTime/1_000_000)+THIRTY_DAYS+1);
         vm.expectRevert(StaleBlockTime.selector);
         stakePoolRate.getRate();
+    }
+
+    function test_update_timestamp_underflow() public {
+        vm.warp(1);
+        (uint8 sigV, bytes32 sigR, bytes32 sigS) = getSignature(mockMainnetResponse);
+        IWormhole.Signature[] memory signatures = new IWormhole.Signature[](1);
+        signatures[0] = IWormhole.Signature({r: sigR, s: sigS, v: sigV, guardianIndex: sigGuardianIndex});
+        stakePoolRate.updatePool(mockMainnetResponse, signatures);
+    }
+
+    function test_rate_timestamp_underflow() public {
+        (uint8 sigV, bytes32 sigR, bytes32 sigS) = getSignature(mockMainnetResponse);
+        IWormhole.Signature[] memory signatures = new IWormhole.Signature[](1);
+        signatures[0] = IWormhole.Signature({r: sigR, s: sigS, v: sigV, guardianIndex: sigGuardianIndex});
+        stakePoolRate.updatePool(mockMainnetResponse, signatures);
+        vm.warp(1);
+        stakePoolRate.getRate();
+    }
+
+    function test_max_timestamps() public {
+        vm.warp(type(uint256).max);
+        WormholeMock wormholeMock = new WormholeMock();
+        StakePoolRate _stakePoolRate = new StakePoolRate(
+            address(wormholeMock), 
+            mockPoolAccount,
+            type(uint256).max,
+            type(uint256).max
+        );
+        (uint8 sigV, bytes32 sigR, bytes32 sigS) = getSignature(mockMainnetResponse);
+        IWormhole.Signature[] memory signatures = new IWormhole.Signature[](1);
+        signatures[0] = IWormhole.Signature({r: sigR, s: sigS, v: sigV, guardianIndex: sigGuardianIndex});
+        _stakePoolRate.updatePool(mockMainnetResponse, signatures);
+        _stakePoolRate.getRate();
     }
 
 }
