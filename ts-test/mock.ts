@@ -70,10 +70,9 @@ import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
   const receipt = await tx.wait();
   console.log("Updated            ", receipt?.hash);
 
-  const [totalActiveStakeEth, poolTokenSupplyEth] =
-    await stakePoolRate.getRate();
-  const poolTokenValueEth =
-    Number(totalActiveStakeEth) / Number(poolTokenSupplyEth);
+  const totalActiveStakeEth = await stakePoolRate.totalActiveStake();
+  const poolTokenSupplyEth = await stakePoolRate.poolTokenSupply();
+  const poolTokenValueEth = await stakePoolRate.getRate();
   console.log(
     "solana slot number ",
     (await stakePoolRate.lastUpdateSolanaSlotNumber()).toString()
@@ -86,5 +85,6 @@ import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
   );
   console.log("totalActiveStakeEth", totalActiveStakeEth.toString());
   console.log("poolTokenSupplyEth ", poolTokenSupplyEth.toString());
-  console.log("poolTokenValueEth  ", poolTokenValueEth);
+  console.log("poolTokenValueEth  ", poolTokenValueEth.toString());
+  console.log("Value adjusted     ", Number(poolTokenValueEth) / 10 ** 18);
 })();
