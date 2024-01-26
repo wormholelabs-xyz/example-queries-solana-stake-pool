@@ -36,6 +36,19 @@ The validation includes
 - Response time is at least `block.timestamp - allowedUpdateStaleness`
 - The last update epoch from the stake pool account matches the current epoch in the Clock account
 
+This also emits the following event
+
+```solidity
+event RateUpdated(
+    uint64 indexed epoch,
+    uint64 solanaSlotNumber,
+    uint64 solanaBlockTime,
+    uint64 totalActiveStake,
+    uint64 poolTokenSupply,
+    uint256 calculatedRate
+);
+```
+
 ### getRate
 
 Returns the rate scaled to 1e18 as long as the last updated time is not stale. Effectively, `(totalActiveStake * (10 ** 18)) / poolTokenSupply`.
