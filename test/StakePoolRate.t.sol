@@ -11,6 +11,16 @@ import {WormholeMock} from "./WormholeMock.t.sol";
 
 contract CounterTest is Test {
     using BytesParsing for bytes;
+    
+    event RateUpdated(
+        uint64 indexed epoch,
+        uint64 solanaSlotNumber,
+        uint64 solanaBlockTime,
+        uint64 totalActiveStake,
+        uint64 poolTokenSupply,
+        uint256 calculatedRate
+    );
+
     StakePoolRate public stakePoolRate;
     
     uint256 constant MOCK_GUARDIAN_PRIVATE_KEY = 0xcfb12303a19cde580bb4dd771639b0d26bc68353645571a8cff516ab2ee113a0;
@@ -27,6 +37,7 @@ contract CounterTest is Test {
     bytes32 mockMainnetSigS = 0x6065842f565b72d99a4b3519ba9acb78992b7e1222d7dee8ccddce97176e701e;
     uint64 mockSlot = 243938105;
     uint64 mockBlockTime = 1706151199000000;
+    uint64 mockEpoch = 564;
     uint64 mockTotalActiveStake = 6945276634127298;
     uint64 mockPoolTokenSupply = 6402815224864491;
     uint256 mockRate = 1084722327634292716; // (mockTotalActiveStake * (10 ** 18)) / mockPoolTokenSupply
@@ -67,6 +78,8 @@ contract CounterTest is Test {
         IWormhole.Signature[] memory signatures = new IWormhole.Signature[](1);
         signatures[0] = IWormhole.Signature({r: sigR, s: sigS, v: sigV, guardianIndex: sigGuardianIndex});
 
+        vm.expectEmit();
+        emit RateUpdated(mockEpoch, mockSlot, mockBlockTime, mockTotalActiveStake, mockPoolTokenSupply, mockRate);
         stakePoolRate.updatePool(mockMainnetResponse, signatures);
         assertEq(stakePoolRate.lastUpdateSolanaSlotNumber(), mockSlot);
         assertEq(stakePoolRate.lastUpdateSolanaBlockTime(), mockBlockTime);

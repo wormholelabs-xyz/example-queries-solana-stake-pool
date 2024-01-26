@@ -18,6 +18,15 @@ error UnexpectedResultMismatch(); // 0x1dd329af
 contract StakePoolRate is QueryResponse {
     using BytesParsing for bytes;
 
+    event RateUpdated(
+        uint64 indexed epoch,
+        uint64 solanaSlotNumber,
+        uint64 solanaBlockTime,
+        uint64 totalActiveStake,
+        uint64 poolTokenSupply,
+        uint256 calculatedRate
+    );
+
     uint64 public totalActiveStake;
     uint64 public poolTokenSupply;
     uint64 public lastUpdateSolanaSlotNumber;
@@ -128,6 +137,8 @@ contract StakePoolRate is QueryResponse {
         // according to testing, this saves ~578 gas on lookup but adds ~9076 gas to updates after the first
         // so, this should be a gain assuming > 16x more reads than updates
         calculatedRate = calculateRate(totalActiveStake, poolTokenSupply);
+
+        emit RateUpdated(reverse(_clockEpochLE), s.slotNumber, s.blockTime, totalActiveStake, poolTokenSupply, calculatedRate);
     }
 
     // @notice Returns the rate scaled to 1e18
