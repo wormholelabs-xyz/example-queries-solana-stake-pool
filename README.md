@@ -79,7 +79,7 @@ forge test
 npm ci
 # Generate bindings
 forge build
-npx typechain --target=ethers-v6 .\out\**\*.json
+npx typechain --target=ethers-v6 ./out/**/*.json
 # Start anvil
 anvil --fork-url https://ethereum.publicnode.com
 # Override guardian set
@@ -89,7 +89,7 @@ npx @wormhole-foundation/wormhole-cli evm hijack -a 0x98f3c9e6E3fAce36bAAd05FE09
 #### Run
 
 ```bash
-npx tsx .\ts-test\mock.ts
+npx tsx ./ts-test/mock.ts
 ```
 
 ## Deploy
