@@ -13,7 +13,7 @@ export function logQueryResponseInfo(bytes: string) {
   const solResponse = queryResponse.responses[0]
     .response as SolanaAccountQueryResponse;
   const blockTime = new Date(
-    Number(BigInt(solResponse.blockTime) / BigInt(1000))
+    Number(solResponse.blockTime / BigInt(1000))
   ).toISOString();
   const totalActiveStake = Buffer.from(
     solResponse.results[0].data
@@ -57,4 +57,10 @@ export function logQueryResponseInfo(bytes: string) {
   console.log("poolTokenValue  ", poolTokenValue);
   console.log("lastUpdateEpoch ", lastUpdateEpoch.toString());
   console.log("clockEpoch      ", clockEpoch.toString());
+  return {
+    slotNumber: solResponse.slotNumber,
+    blockTime: solResponse.blockTime,
+    totalActiveStake,
+    poolTokenSupply,
+  };
 }
