@@ -1,7 +1,9 @@
+// contracts/query/QueryResponse.sol
 // SPDX-License-Identifier: Apache 2
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
+// TODO: Change this to use the version of BytesParsing.sol in wormhole-solidity-sdk once it is release.
 import {BytesParsing} from "./BytesParsing.sol";
 import "../interfaces/IWormhole.sol";
 
@@ -137,7 +139,7 @@ abstract contract QueryResponse {
     function parseAndVerifyQueryResponse(bytes memory response, IWormhole.Signature[] memory signatures) public view returns (ParsedQueryResponse memory r) {
         verifyQueryResponseSignatures(response, signatures);
 
-        uint index = 0;
+        uint index;
         
         (r.version, index) = response.asUint8Unchecked(index);
         if (r.version != VERSION) {
@@ -189,7 +191,7 @@ abstract contract QueryResponse {
         r.responses = new ParsedPerChainQueryResponse[](numPerChainQueries);
 
         // Walk through the requests and responses in lock step.
-        for (uint idx = 0; idx < numPerChainQueries;) {
+        for (uint idx; idx < numPerChainQueries;) {
             (r.responses[idx].chainId, reqIdx) = response.asUint16Unchecked(reqIdx);
             uint16 respChainId;
             (respChainId, respIdx) = response.asUint16Unchecked(respIdx);
@@ -232,8 +234,8 @@ abstract contract QueryResponse {
                 revert UnsupportedQueryType();
         }
 
-        uint reqIdx = 0;
-        uint respIdx = 0;
+        uint reqIdx;
+        uint respIdx;
 
         uint32 len;
         (len, reqIdx) = pcr.request.asUint32Unchecked(reqIdx); // block_id_len
@@ -258,7 +260,7 @@ abstract contract QueryResponse {
         r.result = new EthCallData[](numBatchCallData);
 
         // Walk through the call data and results in lock step.
-        for (uint idx = 0; idx < numBatchCallData;) {
+        for (uint idx; idx < numBatchCallData;) {
             (r.result[idx].contractAddress, reqIdx) = pcr.request.asAddressUnchecked(reqIdx);
 
             (len, reqIdx) = pcr.request.asUint32Unchecked(reqIdx); // call_data_len
@@ -281,8 +283,8 @@ abstract contract QueryResponse {
                 revert UnsupportedQueryType();
         }
 
-        uint reqIdx = 0;
-        uint respIdx = 0;
+        uint reqIdx;
+        uint respIdx;
         uint32 len;
 
         (r.requestTargetTimestamp, reqIdx) = pcr.request.asUint64Unchecked(reqIdx); // Request target_time_us
@@ -313,7 +315,7 @@ abstract contract QueryResponse {
         r.result = new EthCallData[](numBatchCallData);
 
         // Walk through the call data and results in lock step.
-        for (uint idx = 0; idx < numBatchCallData;) {
+        for (uint idx; idx < numBatchCallData;) {
             (r.result[idx].contractAddress, reqIdx) = pcr.request.asAddressUnchecked(reqIdx);
 
             (len, reqIdx) = pcr.request.asUint32Unchecked(reqIdx); // call_data_len
@@ -335,8 +337,8 @@ abstract contract QueryResponse {
                 revert UnsupportedQueryType();
         }
 
-        uint reqIdx = 0;
-        uint respIdx = 0;
+        uint reqIdx;
+        uint respIdx;
         uint32 len;
 
         (len, reqIdx) = pcr.request.asUint32Unchecked(reqIdx); // Request block_id_len
@@ -363,7 +365,7 @@ abstract contract QueryResponse {
         r.result = new EthCallData[](numBatchCallData);
 
         // Walk through the call data and results in lock step.
-        for (uint idx = 0; idx < numBatchCallData;) {
+        for (uint idx; idx < numBatchCallData;) {
             (r.result[idx].contractAddress, reqIdx) = pcr.request.asAddressUnchecked(reqIdx);
 
             (len, reqIdx) = pcr.request.asUint32Unchecked(reqIdx); // call_data_len
@@ -385,8 +387,8 @@ abstract contract QueryResponse {
             revert UnsupportedQueryType();
         }
 
-        uint reqIdx = 0;
-        uint respIdx = 0;
+        uint reqIdx;
+        uint respIdx;
         uint32 len;
 
         (len, reqIdx) = pcr.request.asUint32Unchecked(reqIdx); // Request commitment_len
@@ -411,15 +413,13 @@ abstract contract QueryResponse {
         r.results = new SolanaAccountResult[](numAccounts);
 
         // Walk through the call data and results in lock step.
-        for (uint idx = 0; idx < numAccounts;) {
+        for (uint idx; idx < numAccounts;) {
             (r.results[idx].account, reqIdx) = pcr.request.asBytes32Unchecked(reqIdx); // Request account
 
             (r.results[idx].lamports, respIdx) = pcr.response.asUint64Unchecked(respIdx); // Response lamports
             (r.results[idx].rentEpoch, respIdx) = pcr.response.asUint64Unchecked(respIdx); // Response rent_epoch
 
-            uint8 executable;
-            (executable, respIdx) = pcr.response.asUint8Unchecked(respIdx); // Response executable
-            r.results[idx].executable = (executable != 0);
+            (r.results[idx].executable, respIdx) = pcr.response.asBoolUnckecked(respIdx); // Response executable
 
             (r.results[idx].owner, respIdx) = pcr.response.asBytes32Unchecked(respIdx); // Response owner
 
@@ -458,7 +458,7 @@ abstract contract QueryResponse {
 
         uint256 numChainIds = _validChainIds.length;
         
-        for (uint256 idx = 0; idx < numChainIds;) {
+        for (uint256 idx; idx < numChainIds;) {
             if (chainId == _validChainIds[idx]) {
                 validChainId = true;
                 break;
@@ -474,7 +474,7 @@ abstract contract QueryResponse {
     function validateMultipleEthCallData(EthCallData[] memory r, address[] memory _expectedContractAddresses, bytes4[] memory _expectedFunctionSignatures) public pure {
         uint256 callDatasLength = r.length;
         
-        for (uint256 idx = 0; idx < callDatasLength;) {
+        for (uint256 idx; idx < callDatasLength;) {
             validateEthCallData(r[idx], _expectedContractAddresses, _expectedFunctionSignatures);
 
             unchecked { ++idx; }
@@ -497,7 +497,7 @@ abstract contract QueryResponse {
         uint256 contractAddressesLength = _expectedContractAddresses.length;
         
         // Check that the contract address called in the request is expected
-        for (uint256 idx = 0; idx < contractAddressesLength;) {
+        for (uint256 idx; idx < contractAddressesLength;) {
             if (r.contractAddress == _expectedContractAddresses[idx]) {
                 validContractAddress = true;
                 break;
@@ -514,7 +514,7 @@ abstract contract QueryResponse {
         uint256 functionSignaturesLength = _expectedFunctionSignatures.length;
 
         // Check that the function signature called is expected
-        for (uint256 idx = 0; idx < functionSignaturesLength;) {
+        for (uint256 idx; idx < functionSignaturesLength;) {
             (bytes4 funcSig,) = r.callData.asBytes4Unchecked(0);
             if (funcSig == _expectedFunctionSignatures[idx]) {
                 validFunctionSignature = true;
