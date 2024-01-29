@@ -5,11 +5,12 @@ import {
   SolanaAccountQueryRequest,
   signaturesToEvmStruct,
 } from "@wormhole-foundation/wormhole-query-sdk";
+import { strictEqual } from "assert";
+import base58 from "bs58";
 import { Wallet, getDefaultProvider } from "ethers";
 import { StakePoolRate__factory } from "../types/ethers-contracts";
-import { logQueryResponseInfo } from "./utils";
-import base58 from "bs58";
 import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
+import { logQueryResponseInfo } from "./utils";
 
 (async () => {
   const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
@@ -46,7 +47,8 @@ import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
     ),
   ]);
   const resp = await mock.mock(query);
-  logQueryResponseInfo(resp.bytes);
+  const { slotNumber, blockTime, totalActiveStake, poolTokenSupply } =
+    logQueryResponseInfo(resp.bytes);
 
   console.log(
     `\nDeploying StakePoolRate ${WORMHOLE_ADDRESS} ${JITO_ADDRESS_HEX} ${THIRTY_MINUTES} ${THIRTY_DAYS}\n`
@@ -70,21 +72,30 @@ import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
   const receipt = await tx.wait();
   console.log("Updated            ", receipt?.hash);
 
+  const solanaSlotNumberEth = await stakePoolRate.lastUpdateSolanaSlotNumber();
+  const solanaBlockTimeEth = await stakePoolRate.lastUpdateSolanaBlockTime();
   const totalActiveStakeEth = await stakePoolRate.totalActiveStake();
   const poolTokenSupplyEth = await stakePoolRate.poolTokenSupply();
   const poolTokenValueEth = await stakePoolRate.getRate();
-  console.log(
-    "solana slot number ",
-    (await stakePoolRate.lastUpdateSolanaSlotNumber()).toString()
-  );
+  const poolTokenValueAdj = Number(poolTokenValueEth) / 10 ** 18;
+  console.log("solana slot number ", solanaSlotNumberEth.toString());
   console.log(
     "solana block time  ",
-    new Date(
-      Number((await stakePoolRate.lastUpdateSolanaBlockTime()) / BigInt(1000))
-    ).toISOString()
+    new Date(Number(solanaBlockTimeEth / BigInt(1000))).toISOString()
   );
   console.log("totalActiveStakeEth", totalActiveStakeEth.toString());
   console.log("poolTokenSupplyEth ", poolTokenSupplyEth.toString());
   console.log("poolTokenValueEth  ", poolTokenValueEth.toString());
-  console.log("Value adjusted     ", Number(poolTokenValueEth) / 10 ** 18);
+  console.log("Value adjusted     ", poolTokenValueAdj);
+
+  strictEqual(solanaSlotNumberEth, slotNumber);
+  strictEqual(solanaBlockTimeEth, blockTime);
+  strictEqual(totalActiveStakeEth, totalActiveStake);
+  strictEqual(poolTokenSupplyEth, poolTokenSupply);
+  strictEqual(
+    poolTokenValueEth,
+    (totalActiveStake * BigInt(10) ** BigInt(18)) / poolTokenSupply
+  );
+
+  provider.destroy();
 })();
