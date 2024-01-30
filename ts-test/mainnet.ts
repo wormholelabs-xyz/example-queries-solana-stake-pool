@@ -1,4 +1,4 @@
-// Usage: API_KEY=<> npx tsx ts-test/testnet.ts
+// Usage: API_KEY=<> npx tsx ts-test/mainnet.ts
 import {
   PerChainQueryRequest,
   QueryProxyQueryResponse,
@@ -10,7 +10,7 @@ import "dotenv/config";
 import { logQueryResponseInfo } from "./utils";
 import { DATA_SLICE_LENGTH, DATA_SLICE_OFFSET } from "./consts";
 
-const SOLANA_NODE_URL = "https://api.devnet.solana.com";
+const SOLANA_NODE_URL = "https://api.mainnet-beta.solana.com";
 
 async function getSolanaSlot(comm: string): Promise<bigint> {
   const response = await axios.post(SOLANA_NODE_URL, {
@@ -24,7 +24,7 @@ async function getSolanaSlot(comm: string): Promise<bigint> {
 }
 
 (async () => {
-  const QUERY_URL = "https://testnet.ccq.vaa.dev/v1/query";
+  const QUERY_URL = "https://api.wormholelabs.xyz/v1/query";
   const API_KEY = process.env.API_KEY;
   if (!API_KEY) {
     throw new Error("API_KEY is required");
@@ -34,7 +34,7 @@ async function getSolanaSlot(comm: string): Promise<bigint> {
   const minContextSlot = BigInt(currSlot) + BigInt(2);
 
   console.log(
-    `Performing query against Wormhole testnet, currentSlot: `,
+    `Performing query against Wormhole mainnet, currentSlot: `,
     currSlot,
     ` using minContext Slot: `,
     minContextSlot,
@@ -44,7 +44,7 @@ async function getSolanaSlot(comm: string): Promise<bigint> {
   // devnet stake pool from
   // solana-program-library % ./target/release/spl-stake-pool --url "https://api.devnet.solana.com" list-all
   const accounts = [
-    "DBEr3Z4vdR9WH2jv1hY8Xh1KYQWnBGFjUubvLGdRSvZw",
+    "Jito4APyf642JPZPx3hGc6WWJ8zPKtRbRs4P815Awbb",
     "SysvarC1ock11111111111111111111111111111111",
   ];
 
