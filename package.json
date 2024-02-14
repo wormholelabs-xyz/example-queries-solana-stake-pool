@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@wormhole-foundation/wormhole-query-sdk": "^0.0.9",
-    "axios": "^1.6.5",
+    "@wormhole-foundation/wormhole-query-sdk": "^0.0.10",
+    "axios": "^1.6.7",
     "bs58": "^5.0.0",
     "dotenv": "^16.3.2",
     "ethers": "^6.10.0"
