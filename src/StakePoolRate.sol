@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.19;
 
-import "./libraries/BytesParsing.sol";
-import "./libraries/QueryResponse.sol";
+import "wormhole-solidity-sdk/libraries/BytesParsing.sol";
+import "wormhole-solidity-sdk/QueryResponse.sol";
 
 error InvalidAccount();           // 0x6d187b28
 error InvalidAccountOwner();      // 0x36b1fa3a

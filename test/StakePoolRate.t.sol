@@ -3,11 +3,11 @@
 pragma solidity ^0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import "../src/interfaces/IWormhole.sol";
-import "../src/libraries/BytesParsing.sol";
-import "../src/libraries/QueryResponse.sol";
+import "wormhole-solidity-sdk/interfaces/IWormhole.sol";
+import "wormhole-solidity-sdk/libraries/BytesParsing.sol";
+import "wormhole-solidity-sdk/QueryResponse.sol";
 import "../src/StakePoolRate.sol";
-import {WormholeMock} from "./WormholeMock.t.sol";
+import {WormholeMock} from "wormhole-solidity-sdk/testing/helpers/WormholeMock.sol";
 
 contract CounterTest is Test {
     using BytesParsing for bytes;
