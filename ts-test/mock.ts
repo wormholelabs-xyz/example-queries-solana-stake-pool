@@ -62,6 +62,7 @@ import { logQueryResponseInfo } from "./utils";
     THIRTY_MINUTES,
     THIRTY_DAYS
   );
+  await stakePoolRate.waitForDeployment();
   console.log(`Deployed address ${await stakePoolRate.getAddress()}`);
 
   console.log(`\nPosting query\n`);
