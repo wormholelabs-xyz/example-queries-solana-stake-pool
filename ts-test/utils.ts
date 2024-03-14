@@ -62,5 +62,6 @@ export function logQueryResponseInfo(bytes: string) {
     blockTime: solResponse.blockTime,
     totalActiveStake,
     poolTokenSupply,
+    clockEpoch,
   };
 }
