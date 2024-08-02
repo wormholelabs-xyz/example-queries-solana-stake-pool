@@ -24,7 +24,7 @@ async function getSolanaSlot(comm: string): Promise<bigint> {
 }
 
 (async () => {
-  const QUERY_URL = "https://testnet.ccq.vaa.dev/v1/query";
+  const QUERY_URL = "https://testnet.query.wormhole.com/v1/query";
   const API_KEY = process.env.API_KEY;
   if (!API_KEY) {
     throw new Error("API_KEY is required");
